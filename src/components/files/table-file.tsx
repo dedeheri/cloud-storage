@@ -31,7 +31,7 @@ const TableFile = ({ files, action, setSuccess }: Props) => {
       <TableHeader>
         <TableRow className="whitespace-nowrap">
           <TableHead className="w-[800px]">Filename</TableHead>
-          <TableHead>Owner</TableHead>
+
           <TableHead>Modified</TableHead>
           <TableHead>File size</TableHead>
           <TableHead>Location</TableHead>
@@ -69,19 +69,7 @@ const TableFile = ({ files, action, setSuccess }: Props) => {
                 )}
               </div>
             </TableCell>
-            <TableCell>
-              <div className="flex items-center space-x-2">
-                <Avatar className="h-6 w-6 ">
-                  <AvatarImage
-                    className="w-full h-full rounded-full"
-                    src={file.fileOwner.image}
-                    alt={file.fileOwner.name}
-                  />
-                  <AvatarFallback>CN</AvatarFallback>
-                </Avatar>
-                <span>{file.fileOwner.name}</span>
-              </div>
-            </TableCell>
+
             <TableCell>{moment(file.updatedAt).format("LLL")}</TableCell>
             <TableCell>{file.fileSize ? bytes(file.fileSize) : "-"}</TableCell>
             <TableCell>

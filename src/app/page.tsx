@@ -2,21 +2,16 @@
 
 import Link from "next/link";
 import { Spotlight } from "@/components/ui/spotlight";
-import { TextGenerateEffect } from "@/components/ui/text-generate-effect";
-import { CardBody, CardContainer, CardItem } from "@/components/ui/3d-card";
 
 import banner from "@/assets/banner.png";
 
 import { motion } from "framer-motion";
 
-import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/moving-border";
 import Image from "next/image";
 import { IconCloud } from "@tabler/icons-react";
 
 export default async function Page() {
-  const router = useRouter();
-
   return (
     <div className="h-screen  w-full  md:items-center md:justify-center bg-black/[0.96] antialiased bg-grid-white/[0.02] relative overflow-hidden">
       <div className="max-w-7xl mx-auto pt-10">

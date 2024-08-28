@@ -27,10 +27,9 @@ const TableFolder = ({ folders, action, setSuccess }: Props) => {
       <TableHeader>
         <TableRow className="whitespace-nowrap">
           <TableHead className="w-[800px]">Folder</TableHead>
-          <TableHead>Owner</TableHead>
-          <TableHead>Modified</TableHead>
-          <TableHead>File size</TableHead>
           <TableHead>File</TableHead>
+          <TableHead>File size</TableHead>
+          <TableHead>Modified</TableHead>
           <TableHead className="sr-only">Actions</TableHead>
         </TableRow>
       </TableHeader>
@@ -51,24 +50,12 @@ const TableFolder = ({ folders, action, setSuccess }: Props) => {
                 )}
               </div>
             </TableCell>
-            <TableCell>
-              <div className="flex items-center space-x-2">
-                <Avatar className="h-6 w-6 ">
-                  <AvatarImage
-                    className="w-full h-full rounded-full"
-                    src={folder.User.image}
-                    alt={folder.User.name}
-                  />
-                  <AvatarFallback>CN</AvatarFallback>
-                </Avatar>
-                <span>{folder.User.name}</span>
-              </div>
-            </TableCell>
-            <TableCell>{moment(folder.updatedAt).format("LLL")}</TableCell>
+
+            <TableCell>{folder.totalFiles ? folder.totalFiles : "-"}</TableCell>
             <TableCell>
               {folder.fileSize ? bytes(folder.fileSize) : "-"}
             </TableCell>
-            <TableCell>{folder.totalFiles ? folder.totalFiles : "-"}</TableCell>
+            <TableCell>{moment(folder.updatedAt).format("LLL")}</TableCell>
             <TableCell>
               <ActionFolder
                 action={action}

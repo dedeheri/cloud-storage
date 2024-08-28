@@ -9,13 +9,10 @@ import {
   IconDeviceFloppy,
   IconFolder,
   IconPhoto,
-  IconShare,
-  IconStar,
   IconTrash,
 } from "@tabler/icons-react";
 import { cn } from "@/lib/utils";
 import Navbar from "./navbar";
-import Link from "next/link";
 
 interface Props {
   children: React.ReactNode;
@@ -100,9 +97,21 @@ export function Container({ children }: Props) {
         </SidebarBody>
       </Sidebar>
 
-      <div className="rounded-tl-2xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-black overflow-y-scroll h-screen w-full space-y-7">
+      <div className="rounded-tl-2xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-black overflow-y-scroll h-screen w-full">
         <Navbar />
-        <div className="p-2 md:px-7 space-y-10">{children}</div>
+
+        <motion.div
+          initial={{ opacity: 0.0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{
+            delay: 0.1,
+            duration: 0.5,
+            ease: "easeInOut",
+          }}
+          className="p-2 px-4 md:px-7 space-y-8 mt-8"
+        >
+          {children}
+        </motion.div>
       </div>
     </div>
   );

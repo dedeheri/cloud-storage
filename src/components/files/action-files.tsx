@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import {
@@ -34,6 +34,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Input } from "../ui/input";
+import { Card } from "../ui/card";
 
 const formRenameFile = z.object({
   fileName: z.string().min(1, "Folder is required"),
@@ -46,10 +47,26 @@ interface Props {
 }
 
 const ActionFiles = ({ data, action, setSuccess }: Props) => {
+  // folder
+  const [fetchFolder, setFetchFolder] = useState<[]>([]);
+  const [selectedFolder, setSelectedFolder] = useState<string>("");
+
+  // loading
   const [loadingTrash, setLoadingTrash] = useState<boolean>(false);
   const [loadingStarred, setLoadingStarred] = useState<boolean>(false);
   const [loadingRename, setLoadingRename] = useState<boolean>(false);
   const [loadingRestore, setLoadingRestore] = useState<boolean>(false);
+  const [loadingMove, setLoadingMove] = useState<boolean>(false);
+
+  // fetch folder
+  useEffect(() => {
+    const fetch = async () => {
+      const response = await axios.get("/api/folder");
+      setFetchFolder(response?.data?.data);
+    };
+
+    fetch();
+  }, []);
 
   const handleTrash = async (id: string) => {
     try {
@@ -141,12 +158,36 @@ const ActionFiles = ({ data, action, setSuccess }: Props) => {
     }
   };
 
+  const handleMove = async (fileId: string) => {
+    try {
+      setSuccess(false);
+      setLoadingMove(true);
+
+      const response = await axios.put(
+        `/api/files/move?fileId=${fileId}&folderId=${selectedFolder}`
+      );
+
+      toast({
+        description: response?.data?.message,
+      });
+    } catch (error) {
+      setSuccess(true);
+      setLoadingMove(false);
+      toast({
+        description: (error as any)?.response?.data?.message,
+      });
+    } finally {
+      setSuccess(true);
+      setLoadingMove(false);
+    }
+  };
+
   return (
     <Popover>
       <PopoverTrigger>
         <Button
-          variant="secondary"
-          className="py-1 px-2  opacity-0 group-hover:opacity-100"
+          variant="ghost"
+          className="py-0 px-1 opacity-0 group-hover:opacity-100"
         >
           <IconDots className="w-5 h-5" />
         </Button>
@@ -178,7 +219,6 @@ const ActionFiles = ({ data, action, setSuccess }: Props) => {
               <span>{loadingStarred ? "Updated" : "Starred"} </span>
             </Button>
             {/* rename */}
-
             <Dialog>
               <DialogTrigger className="w-full">
                 <Button
@@ -242,16 +282,62 @@ const ActionFiles = ({ data, action, setSuccess }: Props) => {
                 {/* end form */}
               </DialogContent>
             </Dialog>
-
             {/* end rename */}
 
-            <Button
-              variant="ghost"
-              className="flex w-full px-2 items-center space-x-2 !justify-start"
-            >
-              <IconArrowsMove className="w-4 h-4" />
-              <span>Move</span>
-            </Button>
+            {/* move */}
+
+            <Dialog>
+              <DialogTrigger className="w-full">
+                <Button
+                  variant="ghost"
+                  className="flex w-full px-2 items-center space-x-2 !justify-start"
+                >
+                  <IconArrowsMove className="w-4 h-4" />
+                  <span>Move</span>
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[425px]">
+                <DialogHeader>
+                  <DialogTitle>Select Folder</DialogTitle>
+                </DialogHeader>
+
+                <div className="space-y-2">
+                  {fetchFolder?.map((folder: any) => (
+                    <Card
+                      className={`p-2 cursor-pointer dark:hover:bg-neutral-800 duration-300 ${
+                        selectedFolder === folder?.id ? "dark:border-white" : ""
+                      }`}
+                      key={folder?.id}
+                      onClick={() => setSelectedFolder(folder?.id)}
+                    >
+                      {folder?.folderName}
+                    </Card>
+                  ))}
+                </div>
+
+                <DialogFooter>
+                  {loadingMove ? (
+                    <Button
+                      disabled
+                      variant="secondary"
+                      className="flex items-center space-x-1 w-32"
+                    >
+                      <IconLoader2 className="w-5 h-5 animate-spin " />
+                      <span>Processing</span>
+                    </Button>
+                  ) : (
+                    <Button
+                      onClick={() => handleMove(data?.id)}
+                      variant="secondary"
+                      className="flex items-center space-x-1 w-32"
+                    >
+                      Move
+                    </Button>
+                  )}
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+            {/* end move */}
 
             <div className="border-b" />
             {/* trash */}

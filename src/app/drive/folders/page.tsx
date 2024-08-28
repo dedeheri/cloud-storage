@@ -49,18 +49,16 @@ const Page = () => {
 
   return (
     <Container>
-      <div className="space-y-8">
-        <AddFolders success={setSuccessCreateFolder} />
+      <AddFolders success={setSuccessCreateFolder} />
 
-        <div className="flex items-center justify-between">
-          <FilterStarred />
+      <div className="flex items-center justify-between">
+        <FilterStarred />
 
-          <ToggleModeDisplay
-            localStorageName={"display-folder"}
-            onSet={setModeGridOrList}
-            valueSet={modeGridOrList}
-          />
-        </div>
+        <ToggleModeDisplay
+          localStorageName={"display-folder"}
+          onSet={setModeGridOrList}
+          valueSet={modeGridOrList}
+        />
       </div>
 
       {loading && (

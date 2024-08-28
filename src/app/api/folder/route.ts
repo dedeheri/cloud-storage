@@ -52,9 +52,6 @@ export const GET = async () => {
     //   if folder empty
     const folderByUser = await db.folders.findMany({
       where: { userId: user?.user?.id, trash: false },
-      include: {
-        User: true,
-      },
     });
 
     if (folderByUser.length === 0) return responseJson("Folder is empty", 404);
