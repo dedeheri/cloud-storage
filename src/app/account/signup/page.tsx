@@ -29,7 +29,7 @@ export const signUpSchema = z.object({
     .min(6, "password must have than 6 characters"),
 });
 
-const page = () => {
+const Page = () => {
   const router = useRouter();
 
   const [loading, setLoading] = useState<boolean>(false);
@@ -155,4 +155,4 @@ const page = () => {
   );
 };
 
-export default page;
+export default Page;

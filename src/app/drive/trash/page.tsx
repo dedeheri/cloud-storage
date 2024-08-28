@@ -8,7 +8,7 @@ import TableFile from "../../../components/files/table-file";
 import { Skeleton } from "@/components/ui/skeleton";
 import TableFolder from "@/components/folder/table-folder";
 
-const page = () => {
+const Page = () => {
   const [trash, setTrash] = useState<any>([]);
   const [loadingTrash, setLoadingTrash] = useState<boolean>(true);
   const [errorTrash, setErrorTrash] = useState<string>("");
@@ -78,4 +78,4 @@ const page = () => {
   );
 };
 
-export default page;
+export default Page;

@@ -31,7 +31,7 @@ const formSchema = z.object({
     .min(6, "password must have than 6 characters"),
 });
 
-const page = () => {
+const Page = () => {
   const router = useRouter();
 
   const callbackUrlParams = useSearchParams();
@@ -175,4 +175,4 @@ const page = () => {
   );
 };
 
-export default page;
+export default Page;

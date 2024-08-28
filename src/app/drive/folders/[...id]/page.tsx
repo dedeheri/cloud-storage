@@ -1,8 +1,8 @@
 import { Container } from "@/components/container";
 import React from "react";
 
-const page = () => {
+const Page = () => {
   return <Container>here</Container>;
 };
 
-export default page;
+export default Page;

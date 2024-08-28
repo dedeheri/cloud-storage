@@ -13,7 +13,7 @@ import ToggleModeDisplay from "@/components/toggle-mode-display";
 import TableFile from "@/components/files/table-file";
 import CardFile from "@/components/files/card-file";
 
-const page = () => {
+const Page = () => {
   const [files, setFiles] = useState<any>([]);
   const [loadingFiles, setLoadingFiles] = useState<boolean>(true);
   const [errorFiles, setErrorFiles] = useState<string>("");
@@ -113,4 +113,4 @@ const page = () => {
   );
 };
 
-export default page;
+export default Page;

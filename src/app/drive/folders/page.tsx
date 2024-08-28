@@ -11,7 +11,7 @@ import { AddFolders } from "@/components/add-folder";
 import { Skeleton } from "@/components/ui/skeleton";
 import FilterStarred from "@/components/filter-starred";
 
-const page = () => {
+const Page = () => {
   const [folders, setFolders] = useState<any>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [errorFolder, setErrorFolder] = useState<string>("");
@@ -91,4 +91,4 @@ const page = () => {
   );
 };
 
-export default page;
+export default Page;
