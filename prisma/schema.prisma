@@ -1,0 +1,61 @@
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider  = "postgresql"
+    url       = env("DATABASE_URL")
+    directUrl = env("DIRECT_URL")
+}
+
+model Account {
+    id        String   @id @default(cuid())
+    email     String   @unique
+    password  String
+    createdAt DateTime @default(now())
+    updateAt  DateTime @updatedAt
+}
+
+model User {
+    id        String    @id @default(cuid())
+    name      String
+    email     String    @unique
+    image     String    @default("https://www.kindpng.com/picc/m/439-4391309_nic-avatar-pixel-hd-png-download.png")
+    accountId String?   @unique
+    createdAt DateTime  @default(now())
+    updateAt  DateTime  @updatedAt
+    Folders   Folders[]
+    Files     Files[]
+}
+
+model Files {
+    id          String   @id @default(cuid())
+    fileId      String?  @unique
+    fileName    String?
+    fileType    String?
+    fileSize    Int?
+    fileUrl     String?
+    fileOwnerId String?
+    fileOwner   User?    @relation(fields: [fileOwnerId], references: [id])
+    starred     Boolean  @default(false)
+    trash       Boolean  @default(false)
+    createdAt   DateTime @default(now())
+    updateAt    DateTime @updatedAt
+
+    folderId String?
+    folder   Folders? @relation(fields: [folderId], references: [id])
+}
+
+model Folders {
+    id         String   @id @default(cuid())
+    folderName String?  @unique
+    User       User?    @relation(fields: [userId], references: [id])
+    trash      Boolean  @default(false)
+    starred    Boolean  @default(false)
+    userId     String?
+    totalFiles Int?     @default(0)
+    fileSize   Int?     @default(0)
+    createdAt  DateTime @default(now())
+    updateAt   DateTime @updatedAt
+    Files      Files[]
+}
