@@ -14,7 +14,7 @@ import { Button } from "@/components/ui/moving-border";
 import Image from "next/image";
 import { IconCloud } from "@tabler/icons-react";
 
-export default async function page() {
+export default async function Page() {
   const router = useRouter();
 
   return (

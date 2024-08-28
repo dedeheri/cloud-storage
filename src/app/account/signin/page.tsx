@@ -75,14 +75,6 @@ const Page = () => {
     }
   }
 
-  const handleSignInWithGoogle = async () => {
-    const result = await signIn("google", {
-      callbackUrl: "http://localhost:3000/drive",
-    });
-
-    console.log(result);
-  };
-
   return (
     <AccountContainer>
       <div className="space-y-10">
@@ -91,8 +83,7 @@ const Page = () => {
             Welcome to Cloud
           </h2>
           <p className="text-neutral-600 text-sm max-w-sm mt-2 dark:text-neutral-300">
-            Login to Cloud if you can because we don&apos;t have a login flow
-            yet
+            Login to Cloud if you can because we don't have a login flow yet
           </p>
         </div>
 
@@ -158,18 +149,6 @@ const Page = () => {
         </div>
 
         <div className="bg-gradient-to-r from-transparent via-neutral-300 dark:via-neutral-700 to-transparent my-8 h-[1px] w-full" />
-
-        <div>
-          <Button
-            onClick={handleSignInWithGoogle}
-            type="submit"
-            className="w-full h-10 space-x-2"
-            variant="secondary"
-          >
-            <IconBrandGoogle className="w-5 h-5" />
-            <span> Sign in with Google</span>
-          </Button>
-        </div>
       </div>
     </AccountContainer>
   );
