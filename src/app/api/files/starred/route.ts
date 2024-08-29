@@ -26,7 +26,6 @@ export const PUT = async (req: Request) => {
 
     return response(`Successfully starred file ${files.fileName}`, 200);
   } catch (error) {
-    console.log(error);
-    return response("Something want wrong", 500, error.response);
+    return response("Something want wrong", 500);
   }
 };
