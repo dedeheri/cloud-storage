@@ -1,5 +1,4 @@
 import React from "react";
-import PopperActionFiles from "../popper-action-files";
 import { Card } from "../ui/card";
 import ActionFolder from "../folder/action-folder";
 import { IconFolder, IconStar } from "@tabler/icons-react";
@@ -22,6 +21,7 @@ const CardFolder = ({ folders, setSuccess }: Props) => {
 
             <div className="absolute top-2 right-2">
               <ActionFolder
+                action="folder"
                 folderName={folder?.folderName}
                 id={folder?.id}
                 setSuccess={setSuccess}
