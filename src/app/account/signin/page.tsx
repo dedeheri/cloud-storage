@@ -21,7 +21,7 @@ import Link from "next/link";
 import AccountContainer from "@/components/account-container";
 
 import { toast } from "@/components/ui/use-toast";
-import { IconBrandGoogle, IconLoader2 } from "@tabler/icons-react";
+import { IconLoader2 } from "@tabler/icons-react";
 
 const formSchema = z.object({
   email: z.string().min(1, "Email is required").email("Invalid email"),
@@ -83,7 +83,7 @@ const Page = () => {
             Welcome to Cloud
           </h2>
           <p className="text-neutral-600 text-sm max-w-sm mt-2 dark:text-neutral-300">
-            Login to Cloud if you can because we don't have a login flow yet
+            Login to Cloud if you can because we dont have a login flow yet
           </p>
         </div>
 
@@ -140,15 +140,14 @@ const Page = () => {
             </Button>
           </form>
         </Form>
+        <div className="bg-gradient-to-r from-transparent via-neutral-300 dark:via-neutral-700 to-transparent my-8 h-[1px] w-full" />
 
         <div className="flex justify-center space-x-2">
-          <h1 className="dark:text-neutral-500">Don't have an account?</h1>
+          <h1 className="dark:text-neutral-500">Dont have an account?</h1>
           <Link href={"/account/signup"} className="underline font-medium">
             Sign Up
           </Link>
         </div>
-
-        <div className="bg-gradient-to-r from-transparent via-neutral-300 dark:via-neutral-700 to-transparent my-8 h-[1px] w-full" />
       </div>
     </AccountContainer>
   );
