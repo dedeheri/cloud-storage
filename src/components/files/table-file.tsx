@@ -27,22 +27,22 @@ interface Props {
 }
 const TableFile = ({ files, action, setSuccess }: Props) => {
   return (
-    <Table className="overflow-x-scroll ">
+    <Table className="overflow-x-scroll">
       <TableHeader>
-        <TableRow className="whitespace-nowrap">
-          <TableHead className="w-[800px]">Filename</TableHead>
+        <TableRow className="whitespace-nowrap ">
+          <TableHead className="w-[800px] p-0">Filename</TableHead>
 
-          <TableHead>Modified</TableHead>
-          <TableHead>File size</TableHead>
           <TableHead>Location</TableHead>
+          <TableHead>File size</TableHead>
+          <TableHead>Modified</TableHead>
           <TableHead className="sr-only">Actions</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody className="w-full overflow-x-scroll">
         {files?.map((file: any) => (
-          <TableRow key={file.id} className="group whitespace-nowrap ">
-            <TableCell className="font-medium">
-              <div className="flex justify-between">
+          <TableRow key={file.id} className="group whitespace-nowrap p-0">
+            <TableCell className="font-medium p-0">
+              <div className="flex justify-between pr-5">
                 <div className="flex items-center space-x-2">
                   {file.fileType === "image/png" && (
                     <IconPhoto className="w-5 h-5" />
@@ -70,11 +70,11 @@ const TableFile = ({ files, action, setSuccess }: Props) => {
               </div>
             </TableCell>
 
-            <TableCell>{moment(file.updatedAt).format("LLL")}</TableCell>
-            <TableCell>{file.fileSize ? bytes(file.fileSize) : "-"}</TableCell>
             <TableCell>
               {file?.folder?.folderName ? file?.folder?.folderName : "-"}
             </TableCell>
+            <TableCell>{file.fileSize ? bytes(file.fileSize) : "-"}</TableCell>
+            <TableCell>{moment(file.updatedAt).format("LLL")}</TableCell>
             <TableCell>
               <ActionFiles
                 data={file}

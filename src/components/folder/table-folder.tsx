@@ -25,18 +25,18 @@ const TableFolder = ({ folders, action, setSuccess }: Props) => {
   return (
     <Table className="overflow-x-scroll">
       <TableHeader>
-        <TableRow className="whitespace-nowrap">
-          <TableHead className="w-[800px]">Folder</TableHead>
+        <TableRow className="whitespace-nowrap p-0">
+          <TableHead className="w-[800px] p-0">Folder</TableHead>
           <TableHead>File</TableHead>
           <TableHead>File size</TableHead>
           <TableHead>Modified</TableHead>
           <TableHead className="sr-only">Actions</TableHead>
         </TableRow>
       </TableHeader>
-      <TableBody className="w-full overflow-x-scroll">
+      <TableBody className="w-full overflow-x-scroll p-0">
         {folders?.map((folder: any) => (
-          <TableRow key={folder.id} className="group whitespace-nowrap">
-            <TableCell className="font-medium">
+          <TableRow key={folder.id} className="group whitespace-nowrap p-0">
+            <TableCell className="font-medium p-0">
               <div className="flex justify-between space-x-4">
                 <Link href={`/drive/folders/${folder.id}`}>
                   <div className="flex items-center space-x-2">
