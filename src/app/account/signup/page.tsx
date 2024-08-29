@@ -20,7 +20,7 @@ import { useState } from "react";
 import axios from "axios";
 import { IconLoader2 } from "@tabler/icons-react";
 
-export const signUpSchema = z.object({
+const signUpSchema = z.object({
   name: z.string().min(1, "Name is required").max(100),
   email: z.string().min(1, "Email is required").email("Invalid email"),
   password: z
