@@ -21,36 +21,36 @@ export const PUT = async (req: Request) => {
       where: { id: folderId },
     });
 
-    if (file?.folderId === null) {
-      const fileSize = folder?.fileSize + file?.fileSize;
-      const totalFiles = folder?.totalFiles + 1;
+    // if (file?.folderId === null) {
+    //   const fileSize = folder?.fileSize + file?.fileSize;
+    //   const totalFiles = folder?.totalFiles + 1;
 
-      await db.folders.update({
-        where: { id: folderId },
-        data: { fileSize, totalFiles },
-      });
-    } else if (file?.folderId) {
-      const fileSize = folder?.fileSize + file?.fileSize;
-      const totalFiles = folder?.totalFiles + 1;
+    //   await db.folders.update({
+    //     where: { id: folderId },
+    //     data: { fileSize, totalFiles },
+    //   });
+    // } else if (file?.folderId) {
+    //   const fileSize = folder?.fileSize + file?.fileSize;
+    //   const totalFiles = folder?.totalFiles + 1;
 
-      await db.folders.update({
-        where: { id: file?.folderId },
-        data: { fileSize, totalFiles },
-      });
+    //   await db.folders.update({
+    //     where: { id: file?.folderId },
+    //     data: { fileSize, totalFiles },
+    //   });
 
-      await db.folders.update({
-        where: { id: folderId },
-        data: { fileSize, totalFiles },
-      });
+    //   await db.folders.update({
+    //     where: { id: folderId },
+    //     data: { fileSize, totalFiles },
+    //   });
 
-      //
-      // const fileSize = folder?.fileSize + file?.fileSize;
-      // const totalFiles = folder?.totalFiles - 1;
-      // await db.folders.update({
-      //   where: { id: folderId },
-      //   data: { fileSize, totalFiles },
-      // });
-    }
+    //   //
+    //   // const fileSize = folder?.fileSize + file?.fileSize;
+    //   // const totalFiles = folder?.totalFiles - 1;
+    //   // await db.folders.update({
+    //   //   where: { id: folderId },
+    //   //   data: { fileSize, totalFiles },
+    //   // });
+    // }
 
     // update file
     await db.files.update({
