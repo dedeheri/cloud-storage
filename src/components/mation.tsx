@@ -14,7 +14,6 @@ const Mation = ({ children }: Props) => {
         duration: 0.5,
         ease: "easeInOut",
       }}
-      className="p-2 px-4 md:px-7 space-y-10"
     >
       {children}
     </motion.div>

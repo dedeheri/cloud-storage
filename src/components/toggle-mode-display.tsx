@@ -1,4 +1,5 @@
 import { IconLayout2, IconList } from "@tabler/icons-react";
+import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 
 interface Props {
   onSet: (value: string) => void;
@@ -14,23 +15,38 @@ const ToggleModeDisplay = ({ onSet, valueSet, localStorageName }: Props) => {
 
   return (
     <div className="flex items-center justify-between border  h-9 w-28 rounded-full">
-      <div
-        onClick={() => handleSwitchMode("list")}
-        className={`cursor-pointer rounded-l-full flex items-center justify-center w-full h-full ${
-          valueSet === "list" && "bg-secondary"
-        }`}
-      >
-        <IconList className="w-5 h-5" />
-      </div>
+      <Tooltip delayDuration={0}>
+        <TooltipTrigger asChild>
+          <div
+            onClick={() => handleSwitchMode("list")}
+            className={`cursor-pointer rounded-l-full flex items-center justify-center w-full h-full ${
+              valueSet === "list" && "bg-secondary"
+            }`}
+          >
+            <IconList className="w-5 h-5" />
+          </div>
+        </TooltipTrigger>
+        <TooltipContent>
+          <p>List</p>
+        </TooltipContent>
+      </Tooltip>
+
       <div className="border-l h-full " />
-      <div
-        onClick={() => handleSwitchMode("grid")}
-        className={`cursor-pointer rounded-r-full flex items-center justify-center w-full h-full ${
-          valueSet === "grid" && "bg-secondary"
-        }`}
-      >
-        <IconLayout2 className="w-5 h-5" />
-      </div>
+      <Tooltip delayDuration={0}>
+        <TooltipTrigger asChild>
+          <div
+            onClick={() => handleSwitchMode("grid")}
+            className={`cursor-pointer rounded-r-full flex items-center justify-center w-full h-full ${
+              valueSet === "grid" && "bg-secondary"
+            }`}
+          >
+            <IconLayout2 className="w-5 h-5" />
+          </div>
+        </TooltipTrigger>
+        <TooltipContent>
+          <p>Grid</p>
+        </TooltipContent>
+      </Tooltip>
     </div>
   );
 };

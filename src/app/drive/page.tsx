@@ -10,13 +10,19 @@ import axios from "axios";
 import { Button } from "@/components/ui/button";
 import ToggleModeDisplay from "@/components/toggle-mode-display";
 
-import TableFile from "@/components/files/table-file";
-import CardFile from "@/components/files/card-file";
+import TableFile from "@/components/table-file";
+import CardFile from "@/components/card-file";
+import { AddFolders } from "@/components/add-folder";
+import FilterStarred from "@/components/filter-starred";
+import { useSearchParams } from "next/navigation";
 
 const Page = () => {
-  const [files, setFiles] = useState<any>([]);
+  const [data, setData] = useState<any>([]);
   const [loadingFiles, setLoadingFiles] = useState<boolean>(true);
   const [errorFiles, setErrorFiles] = useState<string>("");
+
+  const params = useSearchParams();
+  const starred = params.get("starred");
 
   const [modeGridOrList, setModeGridOrList] = useState<string>(
     localStorage?.getItem("display-files") || "list"
@@ -31,8 +37,8 @@ const Page = () => {
     const fetchFiles = async () => {
       try {
         setLoadingFiles(true);
-        const response = await axios.get("/api/files");
-        setFiles(response?.data?.data);
+        const response = await axios.get(`/api/files?starred=${starred}`);
+        setData(response?.data?.data);
       } catch (error) {
         setErrorFiles((error as any)?.response?.data?.message);
         setLoadingFiles(false);
@@ -51,18 +57,12 @@ const Page = () => {
       <div className="space-y-8 px-2 ">
         <div className="flex items-center">
           <UploadFiles success={setFetchAgainAfterAction} />
+          <AddFolders success={setFetchAgainAfterAction} />
         </div>
 
         <div className="flex items-center justify-between">
           <div className="flex space-x-2 items-center">
-            <Button
-              variant="secondary"
-              className="rounded-full space-x-2 flex items-center w-32"
-            >
-              <IconStar className="w-5 h-5" />
-              <span>Starred</span>
-            </Button>
-
+            <FilterStarred />
             <Button
               variant="secondary"
               className="rounded-full space-x-2 flex items-center w-32"
@@ -87,7 +87,7 @@ const Page = () => {
           </div>
         )}
 
-        {!loadingFiles && files?.length === 0 && (
+        {!loadingFiles && data?.length === 0 && (
           <div className="flex justify-center pt-10">
             <h1 className="text-xl">{errorFiles}</h1>
           </div>
@@ -97,13 +97,13 @@ const Page = () => {
           !loadingFiles &&
           (modeGridOrList === "list" ? (
             <TableFile
-              files={files}
+              data={data}
               setSuccess={setFetchAgainAfterAction}
               action="files"
             />
           ) : (
             <CardFile
-              files={files}
+              data={data}
               setSuccess={setFetchAgainAfterAction}
               action="files"
             />

@@ -1,118 +1,80 @@
 "use client";
 
-import React, { useState } from "react";
-import { usePathname } from "next/navigation";
-import { motion } from "framer-motion";
+import React from "react";
 
-import { Sidebar, SidebarBody, SidebarLink } from "@/components/ui/sidebar";
+import { useCookies } from "next-client-cookies";
+
 import {
-  IconDeviceFloppy,
-  IconFolder,
-  IconPhoto,
-  IconTrash,
-} from "@tabler/icons-react";
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
+} from "@/components/ui/resizable";
+
 import { cn } from "@/lib/utils";
 import Navbar from "./navbar";
+import SidebarLink from "./sidebar-link";
+import { TooltipProvider } from "./ui/tooltip";
+import Mation from "./mation";
 
 interface Props {
   children: React.ReactNode;
 }
 
 export function Container({ children }: Props) {
-  const pathName = usePathname();
+  const cookies = useCookies();
+  const layout = cookies.get("react-resizable-panels:layout:mail");
+  const collapsed = cookies.get("react-resizable-panels:collapsed");
 
-  const links = [
-    {
-      label: "All files",
-      href: "/drive",
-      icon: (
-        <IconDeviceFloppy
-          className={` dark:text-neutral-200 h-6 w-6 flex-shrink-0 ${
-            pathName === "/drive"
-              ? "text-neutral-700 dark:text-neutral-100"
-              : "text-neutral-400 dark:text-neutral-500"
-          }`}
-        />
-      ),
-    },
-    {
-      label: "Photos",
-      href: "/drive/photos",
-      icon: (
-        <IconPhoto
-          className={` dark:text-neutral-200 h-6 w-6 flex-shrink-0 ${
-            pathName === "/drive/photos"
-              ? "text-neutral-700 dark:text-neutral-100"
-              : "text-neutral-400 dark:text-neutral-500"
-          }`}
-        />
-      ),
-    },
-    {
-      label: "Folder",
-      href: "/drive/folders",
-      icon: (
-        <IconFolder
-          className={` dark:text-neutral-200 h-6 w-6 flex-shrink-0 ${
-            pathName === "/drive/folders"
-              ? "text-neutral-700 dark:text-neutral-100"
-              : "text-neutral-400 dark:text-neutral-500"
-          }`}
-        />
-      ),
-    },
+  const defaultLayout = layout ? JSON.parse(layout) : [13, 32, 48];
+  const defaultCollapsed = collapsed ? JSON.parse(collapsed) : undefined;
 
-    {
-      label: "Trash",
-      href: "/drive/trash",
-      icon: (
-        <IconTrash
-          className={` dark:text-neutral-200 h-6 w-6 flex-shrink-0 ${
-            pathName === "/drive/trash"
-              ? "text-neutral-700 dark:text-neutral-100"
-              : "text-neutral-400 dark:text-neutral-500"
-          }`}
-        />
-      ),
-    },
-  ];
+  const [isCollapsed, setIsCollapsed] = React.useState(defaultCollapsed);
 
-  const [open, setOpen] = useState(false);
   return (
-    <div
-      className={cn(
-        "rounded-md flex flex-col md:flex-row bg-gray-100 dark:bg-neutral-800 w-full flex-1  mx-auto border border-neutral-200 dark:border-neutral-700 overflow-hidden",
-        "h-screen relative"
-      )}
-    >
-      <Sidebar open={open} setOpen={setOpen}>
-        <SidebarBody className="justify-between gap-10">
-          <div className="flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
-            <div className="flex flex-col gap-1">
-              {links.map((link, idx) => (
-                <SidebarLink key={idx} link={link} />
-              ))}
-            </div>
-          </div>
-        </SidebarBody>
-      </Sidebar>
-
-      <div className="rounded-tl-2xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-black overflow-y-scroll h-screen w-full">
-        <Navbar />
-
-        <motion.div
-          initial={{ opacity: 0.0, y: 40 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{
-            delay: 0.1,
-            duration: 0.5,
-            ease: "easeInOut",
+    <TooltipProvider delayDuration={0}>
+      <ResizablePanelGroup
+        direction="horizontal"
+        onLayout={(sizes: number[]) => {
+          document.cookie = `react-resizable-panels:layout:mail=${JSON.stringify(
+            sizes
+          )}`;
+        }}
+        className="h-screen items-stretch overflow-hidden"
+      >
+        <ResizablePanel
+          defaultSize={defaultLayout[0]}
+          collapsedSize={0}
+          collapsible={true}
+          minSize={13}
+          maxSize={13}
+          onCollapse={() => {
+            setIsCollapsed(true);
+            document.cookie = `react-resizable-panels:collapsed=${JSON.stringify(
+              true
+            )}`;
           }}
-          className="p-2 px-4 md:px-7 space-y-8 mt-8"
+          onResize={() => {
+            setIsCollapsed(false);
+            document.cookie = `react-resizable-panels:collapsed=${JSON.stringify(
+              false
+            )}`;
+          }}
+          className={cn(
+            isCollapsed
+              ? "min-w-[60px] dark:bg-black transition-all duration-300 ease-in-out"
+              : `min-w-52 transition-all dark:bg-black duration-300 ease-in-out`
+          )}
         >
-          {children}
-        </motion.div>
-      </div>
-    </div>
+          <SidebarLink isCollapsed={isCollapsed} />
+        </ResizablePanel>
+        <ResizableHandle withHandle />
+        <ResizablePanel defaultSize={80}>
+          <Navbar />
+          <div className="p-6">
+            <Mation>{children}</Mation>
+          </div>
+        </ResizablePanel>
+      </ResizablePanelGroup>
+    </TooltipProvider>
   );
 }

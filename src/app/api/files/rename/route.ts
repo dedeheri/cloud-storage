@@ -11,14 +11,23 @@ export const PUT = async (req: Request) => {
 
     const { searchParams } = new URL(req.url);
     const fileId = searchParams.get("fileId") as string;
+    const type = searchParams.get("type") as string;
 
     // find file
-    const file = await db.files.findUnique({
+    const findFiles = await db.files.findUnique({
+      where: { id: fileId },
+    });
+    const findFolders = await db.folders.findUnique({
       where: { id: fileId },
     });
 
-    if (!file) {
-      return response("Folder not found", 404);
+    if (!findFiles && !findFolders) {
+      return response("File not found", 404);
+    } else if (type === "folders") {
+      await db.folders.update({
+        where: { id: fileId },
+        data: { folderName: body?.fileName },
+      });
     } else {
       await db.files.update({
         where: { id: fileId },

@@ -4,6 +4,17 @@ import authOptions from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 
+interface DataProps {
+  id: string;
+  name?: string | null;
+  type: string | null;
+  size: number | null;
+  url: string | null;
+  starred: boolean | false;
+  modified: Date | null;
+}
+[];
+
 const session = async () => await getServerSession(authOptions);
 
 const response = (message: string, status: number, data?: any) => {
@@ -71,19 +82,69 @@ export const GET = async (req: Request) => {
   try {
     const user = await session();
 
+    const { searchParams } = new URL(req.url);
+    const starred = searchParams.get("starred") as string;
+
     // find files by id
     const files = await db.files.findMany({
-      where: { fileOwnerId: user?.user.id, trash: false },
-      include: { folder: true, fileOwner: true },
+      skip: 0,
+      take: 20,
+      where: {
+        fileOwnerId: user?.user.id,
+        trash: false,
+      },
+      include: { folder: true },
     });
 
+    // find folders by id
+
+    const folders = await db.folders.findMany({
+      skip: 0,
+      take: 5,
+      where: { userId: user?.user.id, trash: false },
+    });
+
+    const joinFileAndFolder = () => {
+      const data: DataProps[] = [];
+
+      files?.map((file) => {
+        data.push({
+          id: file?.id,
+          name: file?.fileName,
+          type: file?.fileType,
+          size: file?.fileSize,
+          modified: file?.createdAt,
+          url: file?.fileUrl,
+          starred: file?.starred,
+        });
+      });
+
+      folders?.map((folder) => {
+        data.push({
+          id: folder?.id,
+          name: folder?.folderName,
+          type: "folders",
+          size: 0,
+          url: null,
+          starred: folder?.starred,
+          modified: folder?.createdAt,
+        });
+      });
+
+      return data.sort((a: any, b: any) => {
+        return new Date(b.modified).getTime() - new Date(a.modified).getTime();
+      });
+    };
+
+    const result = joinFileAndFolder();
+
     // check files
-    if (files.length === 0) {
+    if (result?.length === 0) {
       return response("The file you upload will be available here", 404);
     }
 
     // return all files
-    return response("Successfully", 200, files);
+    return response("Successfully", 200, result);
   } catch (error) {
     return response("Something went wrong", 500);
   }

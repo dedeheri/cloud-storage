@@ -35,6 +35,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Input } from "../ui/input";
 import { Card } from "../ui/card";
+import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 
 const formRenameFile = z.object({
   fileName: z.string().min(1, "Folder is required"),
@@ -59,23 +60,36 @@ const ActionFiles = ({ data, action, setSuccess }: Props) => {
   const [loadingMove, setLoadingMove] = useState<boolean>(false);
 
   // fetch folder
-  useEffect(() => {
-    const fetch = async () => {
-      const response = await axios.get("/api/folder");
-      setFetchFolder(response?.data?.data);
-    };
+  // useEffect(() => {
+  //   const fetch = async () => {
+  //     try {
+  //       const response = await axios.get("/api/folder");
+  //       setFetchFolder(response?.data?.data);
+  //     } catch (error) {
+  //       console.log(error);
+  //     }
+  //   };
 
-    fetch();
-  }, []);
+  //   fetch();
+  // }, []);
 
-  const handleTrash = async (id: string) => {
+  const handleTrash = async (id: string, type: string) => {
     try {
       setLoadingTrash(true);
       setSuccess(false);
 
-      const response = await axios.put(`/api/files/trash?fileId=${id}`);
+      const response = await axios.put(
+        `/api/files/trash?fileId=${id}&type=${type}`
+      );
+      toast({
+        description: response?.data?.message,
+      });
     } catch (error) {
-      console.log(error);
+      toast({
+        description:
+          (error as any)?.response?.data?.message ||
+          (error as any)?.response?.data?.error,
+      });
       setLoadingTrash(false);
       setSuccess(false);
     } finally {
@@ -84,10 +98,12 @@ const ActionFiles = ({ data, action, setSuccess }: Props) => {
     }
   };
 
-  const handleStarred = async (id: string) => {
+  const handleStarred = async (id: string, type: string) => {
     try {
       setLoadingStarred(true);
-      const response = await axios.put(`/api/files/starred?fileId=${id}`);
+      const response = await axios.put(
+        `/api/files/starred?fileId=${id}&type=${type}`
+      );
 
       toast({
         description: response?.data?.message,
@@ -119,13 +135,14 @@ const ActionFiles = ({ data, action, setSuccess }: Props) => {
       setSuccess(false);
       setLoadingRename(true);
 
-      const response = await axios.put(`/api/files/rename?fileId=${data?.id}`, {
-        fileName: values.fileName,
-      });
+      const response = await axios.put(
+        `/api/files/rename?fileId=${data?.id}&type=${data?.type}`,
+        {
+          fileName: values.fileName,
+        }
+      );
 
       toast({
-        className:
-          "top-0 right-0 flex fixed md:max-w-[420px] md:top-4 md:right-4",
         description: (response as any)?.data?.message,
       });
     } catch (error) {
@@ -185,12 +202,16 @@ const ActionFiles = ({ data, action, setSuccess }: Props) => {
   return (
     <Popover>
       <PopoverTrigger>
-        <Button
-          variant="ghost"
-          className="py-0 px-1 opacity-0 group-hover:opacity-100"
-        >
-          <IconDots className="w-5 h-5" />
-        </Button>
+        <Tooltip delayDuration={0}>
+          <TooltipTrigger asChild>
+            <button className="px-2 p-0 opacity-0 group-hover:opacity-100 duration-300">
+              <IconDots className="w-5 h-5" />
+            </button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Action</p>
+          </TooltipContent>
+        </Tooltip>
       </PopoverTrigger>
       <PopoverContent className="w-40 p-1.5 dark:bg-neutral-900 ">
         {action === "trash" ? (
@@ -206,8 +227,9 @@ const ActionFiles = ({ data, action, setSuccess }: Props) => {
           </div>
         ) : (
           <div className="space-y-0">
+            {/* starred */}
             <Button
-              onClick={() => handleStarred(data?.id)}
+              onClick={() => handleStarred(data?.id, data?.type)}
               variant="ghost"
               className="flex w-full  px-2 items-center space-x-2 !justify-start"
             >
@@ -248,7 +270,8 @@ const ActionFiles = ({ data, action, setSuccess }: Props) => {
                           <FormControl>
                             <Input
                               type="text"
-                              placeholder="Folder"
+                              defaultValue={data?.name}
+                              placeholder="Name"
                               {...field}
                             />
                           </FormControl>
@@ -282,62 +305,63 @@ const ActionFiles = ({ data, action, setSuccess }: Props) => {
                 {/* end form */}
               </DialogContent>
             </Dialog>
-            {/* end rename */}
 
             {/* move */}
+            {data?.type !== "folders" && (
+              <Dialog>
+                <DialogTrigger className="w-full">
+                  <Button
+                    variant="ghost"
+                    className="flex w-full px-2 items-center space-x-2 !justify-start"
+                  >
+                    <IconArrowsMove className="w-4 h-4" />
+                    <span>Move</span>
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[425px]">
+                  <DialogHeader>
+                    <DialogTitle>Select Folder</DialogTitle>
+                  </DialogHeader>
 
-            <Dialog>
-              <DialogTrigger className="w-full">
-                <Button
-                  variant="ghost"
-                  className="flex w-full px-2 items-center space-x-2 !justify-start"
-                >
-                  <IconArrowsMove className="w-4 h-4" />
-                  <span>Move</span>
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-[425px]">
-                <DialogHeader>
-                  <DialogTitle>Select Folder</DialogTitle>
-                </DialogHeader>
+                  <div className="space-y-2">
+                    {fetchFolder?.map((folder: any) => (
+                      <Card
+                        className={`p-2 cursor-pointer dark:hover:bg-neutral-800 duration-300 ${
+                          selectedFolder === folder?.id
+                            ? "dark:border-white"
+                            : ""
+                        }`}
+                        key={folder?.id}
+                        onClick={() => setSelectedFolder(folder?.id)}
+                      >
+                        {folder?.folderName}
+                      </Card>
+                    ))}
+                  </div>
 
-                <div className="space-y-2">
-                  {fetchFolder?.map((folder: any) => (
-                    <Card
-                      className={`p-2 cursor-pointer dark:hover:bg-neutral-800 duration-300 ${
-                        selectedFolder === folder?.id ? "dark:border-white" : ""
-                      }`}
-                      key={folder?.id}
-                      onClick={() => setSelectedFolder(folder?.id)}
-                    >
-                      {folder?.folderName}
-                    </Card>
-                  ))}
-                </div>
-
-                <DialogFooter>
-                  {loadingMove ? (
-                    <Button
-                      disabled
-                      variant="secondary"
-                      className="flex items-center space-x-1 w-32"
-                    >
-                      <IconLoader2 className="w-5 h-5 animate-spin " />
-                      <span>Processing</span>
-                    </Button>
-                  ) : (
-                    <Button
-                      onClick={() => handleMove(data?.id)}
-                      variant="secondary"
-                      className="flex items-center space-x-1 w-32"
-                    >
-                      Move
-                    </Button>
-                  )}
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
-            {/* end move */}
+                  <DialogFooter>
+                    {loadingMove ? (
+                      <Button
+                        disabled
+                        variant="secondary"
+                        className="flex items-center space-x-1 w-32"
+                      >
+                        <IconLoader2 className="w-5 h-5 animate-spin " />
+                        <span>Processing</span>
+                      </Button>
+                    ) : (
+                      <Button
+                        onClick={() => handleMove(data?.id)}
+                        variant="secondary"
+                        className="flex items-center space-x-1 w-32"
+                      >
+                        Move
+                      </Button>
+                    )}
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+            )}
 
             <div className="border-b" />
             {/* trash */}
@@ -362,7 +386,7 @@ const ActionFiles = ({ data, action, setSuccess }: Props) => {
 
                 <DialogFooter>
                   <Button
-                    onClick={() => handleTrash(data?.id)}
+                    onClick={() => handleTrash(data?.id, data?.type)}
                     disabled={loadingTrash}
                     type="submit"
                     variant="default"
@@ -376,7 +400,6 @@ const ActionFiles = ({ data, action, setSuccess }: Props) => {
                 </DialogFooter>
               </DialogContent>
             </Dialog>
-            {/* end trash */}
           </div>
         )}
       </PopoverContent>

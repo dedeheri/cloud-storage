@@ -18,15 +18,16 @@ model Account {
 }
 
 model User {
-    id        String    @id @default(cuid())
-    name      String
-    email     String    @unique
-    image     String    @default("https://www.kindpng.com/picc/m/439-4391309_nic-avatar-pixel-hd-png-download.png")
-    accountId String?   @unique
-    createdAt DateTime  @default(now())
-    updateAt  DateTime  @updatedAt
-    Folders   Folders[]
-    Files     Files[]
+    id         String       @id @default(cuid())
+    name       String
+    email      String       @unique
+    image      String       @default("https://www.kindpng.com/picc/m/439-4391309_nic-avatar-pixel-hd-png-download.png")
+    accountId  String?      @unique
+    createdAt  DateTime     @default(now())
+    updateAt   DateTime     @updatedAt
+    Folders    Folders[]
+    Files      Files[]
+    SubFolders SubFolders[]
 }
 
 model Files {
@@ -43,20 +44,37 @@ model Files {
     createdAt   DateTime @default(now())
     updateAt    DateTime @updatedAt
 
-    folderId String?
-    folder   Folders? @relation(fields: [folderId], references: [id])
+    folderId     String?
+    folder       Folders?    @relation(fields: [folderId], references: [id])
+    SubFolders   SubFolders? @relation(fields: [subFoldersId], references: [id])
+    subFoldersId String?
 }
 
 model Folders {
-    id         String   @id @default(cuid())
-    folderName String?  @unique
-    User       User?    @relation(fields: [userId], references: [id])
-    trash      Boolean  @default(false)
-    starred    Boolean  @default(false)
+    id         String       @id @default(cuid())
+    folderName String?      @unique
+    User       User?        @relation(fields: [userId], references: [id])
+    trash      Boolean      @default(false)
+    starred    Boolean      @default(false)
     userId     String?
-    totalFiles Int?     @default(0)
-    fileSize   Int?     @default(0)
-    createdAt  DateTime @default(now())
-    updateAt   DateTime @updatedAt
+    totalFiles Int?         @default(0)
+    fileSize   Int?         @default(0)
+    createdAt  DateTime     @default(now())
+    updateAt   DateTime     @updatedAt
     Files      Files[]
+    SubFolders SubFolders[]
+}
+
+model SubFolders {
+    id            String   @id @default(cuid())
+    subFolderName String?  @unique
+    user          User?    @relation(fields: [userId], references: [id])
+    userId        String?
+    trash         Boolean  @default(false)
+    starred       Boolean  @default(false)
+    folderId      String?
+    folder        Folders? @relation(fields: [folderId], references: [id])
+    files         Files[]
+    createdAt     DateTime @default(now())
+    updateAt      DateTime @updatedAt
 }
