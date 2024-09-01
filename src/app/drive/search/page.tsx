@@ -4,9 +4,7 @@ import React, { useEffect, useState } from "react";
 import { Container } from "@/components/container";
 import { useSearchParams } from "next/navigation";
 import axios from "axios";
-import TableFile from "@/components/files/table-file";
 import { Skeleton } from "@/components/ui/skeleton";
-import TableFolder from "@/components/folder/table-folder";
 
 const Page = () => {
   const params = useSearchParams().get("q");
@@ -34,8 +32,6 @@ const Page = () => {
     fetch();
   }, [params]);
 
-  console.log(data);
-
   return (
     <Container>
       {loadingSearch && (
@@ -47,29 +43,6 @@ const Page = () => {
       )}
 
       {/* folder */}
-
-      {!loadingSearch && (
-        <div className="space-y-3">
-          <h1 className="text-lg md:text-2xl">Folder</h1>
-          <TableFolder
-            folders={data?.folder}
-            setSuccess={setFetchAgainAfterAction}
-            action="folder"
-          />
-        </div>
-      )}
-      {/* file */}
-
-      {!loadingSearch && (
-        <div className="space-y-3">
-          <h1 className="text-lg md:text-2xl">File</h1>
-          <TableFile
-            files={data?.file}
-            setSuccess={setFetchAgainAfterAction}
-            action="files"
-          />
-        </div>
-      )}
     </Container>
   );
 };
