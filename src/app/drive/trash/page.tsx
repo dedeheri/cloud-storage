@@ -17,7 +17,7 @@ const Page = () => {
 
   // mode
   const [modeGridOrList, setModeGridOrList] = useState<string>(
-    localStorage.getItem("display-trash") || "list"
+    localStorage?.getItem("display-trash") || "list"
   );
 
   // page

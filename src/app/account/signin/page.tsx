@@ -1,5 +1,6 @@
 "use client";
 
+import { Suspense } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -76,80 +77,82 @@ const Page = () => {
   }
 
   return (
-    <AccountContainer>
-      <div className="space-y-10">
-        <div className="space-y-3">
-          <h2 className="font-bold text-xl text-neutral-800 dark:text-neutral-200">
-            Welcome to Cloud
-          </h2>
-          <p className="text-neutral-600 text-sm max-w-sm mt-2 dark:text-neutral-300">
-            Login to Cloud if you can because we dont have a login flow yet
-          </p>
+    <Suspense>
+      <AccountContainer>
+        <div className="space-y-10">
+          <div className="space-y-3">
+            <h2 className="font-bold text-xl text-neutral-800 dark:text-neutral-200">
+              Welcome to Cloud
+            </h2>
+            <p className="text-neutral-600 text-sm max-w-sm mt-2 dark:text-neutral-300">
+              Login to Cloud if you can because we dont have a login flow yet
+            </p>
+          </div>
+
+          {/* form */}
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email</FormLabel>
+                    <FormControl>
+                      <Input
+                        className="h-10"
+                        placeholder="email"
+                        type="email"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Password</FormLabel>
+                    <FormControl>
+                      <Input
+                        className="h-10"
+                        type="password"
+                        placeholder="••••••••••"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <Button
+                disabled={loading}
+                type="submit"
+                className="w-full h-10 space-x-1"
+                variant="secondary"
+              >
+                {loading && <IconLoader2 className="w-5 h-5 animate-spin" />}
+
+                <span> Sign in</span>
+              </Button>
+            </form>
+          </Form>
+          <div className="bg-gradient-to-r from-transparent via-neutral-300 dark:via-neutral-700 to-transparent my-8 h-[1px] w-full" />
+
+          <div className="flex justify-center space-x-2">
+            <h1 className="dark:text-neutral-500">Dont have an account?</h1>
+            <Link href={"/account/signup"} className="underline font-medium">
+              Sign Up
+            </Link>
+          </div>
         </div>
-
-        {/* form */}
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Email</FormLabel>
-                  <FormControl>
-                    <Input
-                      className="h-10"
-                      placeholder="email"
-                      type="email"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="password"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Password</FormLabel>
-                  <FormControl>
-                    <Input
-                      className="h-10"
-                      type="password"
-                      placeholder="••••••••••"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <Button
-              disabled={loading}
-              type="submit"
-              className="w-full h-10 space-x-1"
-              variant="secondary"
-            >
-              {loading && <IconLoader2 className="w-5 h-5 animate-spin" />}
-
-              <span> Sign in</span>
-            </Button>
-          </form>
-        </Form>
-        <div className="bg-gradient-to-r from-transparent via-neutral-300 dark:via-neutral-700 to-transparent my-8 h-[1px] w-full" />
-
-        <div className="flex justify-center space-x-2">
-          <h1 className="dark:text-neutral-500">Dont have an account?</h1>
-          <Link href={"/account/signup"} className="underline font-medium">
-            Sign Up
-          </Link>
-        </div>
-      </div>
-    </AccountContainer>
+      </AccountContainer>
+    </Suspense>
   );
 };
 

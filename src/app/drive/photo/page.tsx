@@ -12,7 +12,6 @@ import { Skeleton } from "@/components/ui/skeleton";
 const Page = () => {
   const [photo, setPhoto] = useState<any>([]);
   const [loadingPhoto, setLoadingPhoto] = useState<boolean>(true);
-  const [errorPhoto, setErrorPhoto] = useState<string>("");
 
   useEffect(() => {
     const fetch = async () => {
@@ -43,7 +42,7 @@ const Page = () => {
 
       {!loadingPhoto && (
         <PhotoProvider>
-          <div className="grid grid-cols-2 xl:grid-cols-10 gap-1 group">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 xl:grid-cols-10 gap-1 group">
             {photo?.map((photo: any) => (
               <PhotoView key={photo?.id} src={photo?.url}>
                 <div className="h-48 w-44  cursor-pointer rounded-md relative overflow-hidden">
