@@ -5,48 +5,63 @@ import UploadPopUp from "./uploads-popup";
 import { Button } from "./ui/button";
 import axios from "axios";
 import { toast } from "./ui/use-toast";
+import { useParams } from "next/navigation";
 
 interface Props {
-  success: any;
+  setSuccess: (props: boolean) => void;
 }
 
-const UploadFiles = ({ success }: Props) => {
+const UploadFiles = ({ setSuccess }: Props) => {
   const [files, setFiles] = useState<any>([]);
-  const [progress, setProgress] = useState<boolean>(false);
+
+  const [successUpload, setSuccessUpload] = useState<boolean>(false);
+  const [errorUpload, setErroUpload] = useState<any>(false);
+  const [progressUpload, setProgressUpload] = useState<boolean>(false);
+
+  const params = useParams();
 
   const handleFileUpload = async (
     events: React.ChangeEvent<HTMLInputElement>
   ) => {
     try {
-      setProgress(false);
+      setProgressUpload(true);
       if (events?.target?.files) {
         setFiles(events.target.files);
 
         const formData = new FormData();
         formData.append("file", events.target.files[0]);
 
-        const response = await axios.post("/api/files", formData);
+        const response = await axios.post(
+          `/api/files?folderId=${params.id}`,
+          formData
+        );
 
         toast({
-          className:
-            "top-0 right-0 flex fixed md:max-w-[420px] md:top-4 md:right-4",
           description: response?.data?.message,
         });
       }
     } catch (error) {
+      setSuccess(false);
+      setErroUpload(true);
       toast({
         description: (error as any)?.response?.data?.message,
       });
     } finally {
-      success(true);
-      setProgress(true);
+      setSuccessUpload(true);
+      setSuccess(true);
+      setProgressUpload(false);
     }
   };
 
   return (
     <>
       {/* pop up upload */}
-      <UploadPopUp file={files} progress={progress} />
+      <UploadPopUp
+        file={files}
+        success={successUpload}
+        progress={progressUpload}
+        failed={errorUpload}
+      />
 
       <Button
         variant="outline"

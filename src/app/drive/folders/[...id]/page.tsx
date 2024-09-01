@@ -6,8 +6,8 @@ import axios from "axios";
 import { useParams } from "next/navigation";
 import ToggleModeDisplay from "@/components/toggle-mode-display";
 import UploadFiles from "@/components/upload-files";
-import TableFile from "@/components/files/table-file";
-import CardFile from "@/components/files/card-file";
+import TableFile from "@/components/table-file";
+import CardFile from "@/components/card-file";
 import { Skeleton } from "@/components/ui/skeleton";
 import FilterStarred from "@/components/filter-starred";
 import FilterType from "@/components/filter-type";
@@ -41,11 +41,15 @@ const Page = () => {
     };
 
     fetch();
-  }, []);
+
+    return () => setFetchAgainAfterAction(false);
+  }, [fetchAgainAfterAction]);
 
   return (
     <Container>
-      <UploadFiles success={setFetchAgainAfterAction} />
+      <div className="flex items-center">
+        <UploadFiles success={setFetchAgainAfterAction} />
+      </div>
 
       <div className="flex items-center justify-between">
         <div className="flex space-x-2 items-center">
@@ -81,13 +85,13 @@ const Page = () => {
         !loadingFiles &&
         (modeGridOrList === "list" ? (
           <TableFile
-            files={files}
+            data={files}
             setSuccess={setFetchAgainAfterAction}
             action="files"
           />
         ) : (
           <CardFile
-            files={files}
+            data={files}
             setSuccess={setFetchAgainAfterAction}
             action="files"
           />

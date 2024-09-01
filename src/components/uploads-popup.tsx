@@ -10,10 +10,12 @@ import { Button } from "./ui/button";
 
 interface Props {
   file: any;
+  success: boolean;
+  failed: boolean;
   progress: boolean;
 }
 
-const UploadPopUp = ({ file, progress }: Props) => {
+const UploadPopUp = ({ file, success, failed, progress }: Props) => {
   const [collapsePopup, setCollapsePopup] = React.useState<boolean>(true);
   const [closePopup, setClosePopup] = React.useState<boolean>(false);
 
@@ -62,20 +64,22 @@ const UploadPopUp = ({ file, progress }: Props) => {
             </div>
           </div>
 
-          {/* progress */}
+          {/* success */}
 
           {collapsePopup && file[0] && (
             <div className="space-y-3 p-3 relative">
               <div className="flex space-x-2 items-center">
-                {progress ? (
-                  <IconCheck className="w-5 h-5" />
-                ) : (
+                {progress && (
                   <IconLoader2 className="w-5 h-5 animate-spin duration-1000" />
                 )}
 
+                {success && <IconCheck className="w-5 h-5" />}
+
+                {failed && <IconX className="w-5 h-5" />}
+
                 <h1
                   className={`text-sm ${
-                    progress
+                    success
                       ? "dark:text-white"
                       : "animate-pulse dark:text-neutral-400"
                   }`}

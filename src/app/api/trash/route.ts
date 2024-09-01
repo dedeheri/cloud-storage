@@ -1,15 +1,22 @@
-import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
-import authOptions from "../../../lib/prisma";
-import { db } from "../../../lib/db.prisma";
+import { findManyFiles } from "@/hooks/api/find-file";
+import { findManyFolders } from "@/hooks/api/find-folder";
+import loppingFile from "@/lib/lopping-file";
+import loppingFolder from "@/lib/lopping-folder";
+import sortByDate from "@/lib/sort-by-date";
+import pagination from "@/lib/pagination";
 
-const session = async () => await getServerSession(authOptions);
-
-const response = (message: string, status: number, data?: any) => {
+const response = (
+  message: string,
+  status: number,
+  data?: any,
+  pagination?: any
+) => {
   return NextResponse.json(
     {
       message: message,
-      data: data,
+      pagination,
+      result: data,
     },
     { status: status }
   );
@@ -17,78 +24,27 @@ const response = (message: string, status: number, data?: any) => {
 
 export const GET = async (req: Request) => {
   try {
-    const user = await session();
+    const { searchParams } = new URL(req.url);
+    const page = searchParams.get("page") as string;
 
-    // find files by user session
+    const file = loppingFile(await findManyFiles(true));
+    const folder = loppingFolder(await findManyFolders(true));
+    const sort = sortByDate([...file, ...folder]);
 
-    const files = await db.files.findMany({
-      where: { fileOwnerId: user?.user?.id, trash: true },
-      include: { folder: true, fileOwner: true },
-    });
+    // pagination
+    const startIndex = (parseInt(page) - 1) * 12;
+    const endIndex = parseInt(page) * 12;
+    const paginations = pagination(sort, startIndex, endIndex, page);
+    const results = sort.slice(startIndex, endIndex);
 
-    const folders = await db.folders.findMany({
-      where: { userId: user?.user?.id, trash: true },
-      include: { User: true },
-    });
-
-    if (files.length == 0 && folders.length == 0) {
-      return response("File not found", 404);
+    if (sort?.length == 0) {
+      return response("The file you trashed will be available here", 404);
+    } else {
+      return response("Successfully", 200, results, paginations);
     }
-
-    return NextResponse.json(
-      {
-        message: "Successfully",
-        data: {
-          files: files,
-          folders: folders,
-        },
-      },
-      { status: 200 }
-    );
   } catch (error) {
-    console.log(error);
+    return response("Something went wrong", 500);
   }
 };
 
 // restore
-export const PUT = async (req: Request) => {
-  try {
-    const { searchParams } = new URL(req.url);
-    const trashId = searchParams.get("trashId") as string;
-    const typeRestore = searchParams.get("restore") as string;
-
-    if (typeRestore === "folder") {
-      const folder = await db.folders.findUnique({
-        where: { id: trashId },
-      });
-
-      if (folder) {
-        await db.folders.update({
-          where: { id: trashId },
-          data: { trash: false },
-        });
-        return response("Successfully restore file", 200);
-      } else {
-        return response("File not found", 404);
-      }
-    }
-
-    if (typeRestore === "file") {
-      const folder = await db.files.findUnique({
-        where: { id: trashId },
-      });
-
-      if (folder) {
-        await db.files.update({
-          where: { id: trashId },
-          data: { trash: false },
-        });
-        return response("Successfully restore file", 200);
-      } else {
-        return response("File not found", 404);
-      }
-    }
-  } catch (error) {
-    return response("Something want wrong", 500);
-  }
-};

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 
-import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import {
   IconArrowsMove,
   IconDots,
@@ -9,6 +9,7 @@ import {
   IconRestore,
   IconStar,
   IconTrash,
+  IconTrashX,
 } from "@tabler/icons-react";
 import {
   Dialog,
@@ -18,24 +19,19 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "../ui/dialog";
-import { Button } from "../ui/button";
+} from "./ui/dialog";
+import { Button } from "./ui/button";
 import axios from "axios";
-import { toast } from "../ui/use-toast";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormMessage,
-} from "../ui/form";
+import { toast } from "./ui/use-toast";
+import { Form, FormControl, FormField, FormItem, FormMessage } from "./ui/form";
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Input } from "../ui/input";
-import { Card } from "../ui/card";
-import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
+import { Input } from "./ui/input";
+import { Card } from "./ui/card";
+import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
+import { Skeleton } from "./ui/skeleton";
 
 const formRenameFile = z.object({
   fileName: z.string().min(1, "Folder is required"),
@@ -50,6 +46,7 @@ interface Props {
 const ActionFiles = ({ data, action, setSuccess }: Props) => {
   // folder
   const [fetchFolder, setFetchFolder] = useState<[]>([]);
+  const [loadingFetchFolder, setLoadingFetchFolder] = useState<boolean>(false);
   const [selectedFolder, setSelectedFolder] = useState<string>("");
 
   // loading
@@ -57,21 +54,29 @@ const ActionFiles = ({ data, action, setSuccess }: Props) => {
   const [loadingStarred, setLoadingStarred] = useState<boolean>(false);
   const [loadingRename, setLoadingRename] = useState<boolean>(false);
   const [loadingRestore, setLoadingRestore] = useState<boolean>(false);
+  const [loadingDelete, setLoadingDelete] = useState<boolean>(false);
   const [loadingMove, setLoadingMove] = useState<boolean>(false);
 
-  // fetch folder
-  // useEffect(() => {
-  //   const fetch = async () => {
-  //     try {
-  //       const response = await axios.get("/api/folder");
-  //       setFetchFolder(response?.data?.data);
-  //     } catch (error) {
-  //       console.log(error);
-  //     }
-  //   };
+  // open folder
+  const [openMove, setOpenMove] = useState<boolean>(false);
 
-  //   fetch();
-  // }, []);
+  // fetch folder
+  useEffect(() => {
+    const fetch = async () => {
+      try {
+        setLoadingFetchFolder(true);
+        const response = await axios.get("/api/folder");
+        setFetchFolder(response?.data?.data);
+      } catch (error) {
+        setLoadingFetchFolder(false);
+        console.log(error);
+      } finally {
+        setLoadingFetchFolder(false);
+      }
+    };
+
+    openMove && fetch();
+  }, [openMove]);
 
   const handleTrash = async (id: string, type: string) => {
     try {
@@ -157,21 +162,49 @@ const ActionFiles = ({ data, action, setSuccess }: Props) => {
     }
   };
 
-  const handleRestore = async (id: string) => {
+  const handleRestore = async (id: string, type: string) => {
     try {
       setSuccess(false);
       setLoadingRestore(true);
-      const response = await axios.put(`/api/trash?trashId=${id}&restore=file`);
+      const response = await axios.put(
+        `/api/trash/restore?trashId=${id}&type=${type}`
+      );
 
       toast({
         description: response?.data?.message,
       });
     } catch (error) {
-      setSuccess(true);
+      toast({
+        description: (error as any)?.response?.data?.message,
+      });
+      setSuccess(false);
       setLoadingRestore(false);
     } finally {
       setSuccess(true);
       setLoadingRestore(false);
+    }
+  };
+
+  const handeDelete = async (id: string, type: string) => {
+    try {
+      setSuccess(false);
+      setLoadingDelete(true);
+      const response = await axios.get(
+        `/api/trash/delete?trashId=${id}&type=${type}`
+      );
+
+      toast({
+        description: response?.data?.message,
+      });
+    } catch (error) {
+      toast({
+        description: (error as any)?.response?.data?.message,
+      });
+      setSuccess(false);
+      setLoadingDelete(false);
+    } finally {
+      setSuccess(true);
+      setLoadingDelete(false);
     }
   };
 
@@ -213,16 +246,35 @@ const ActionFiles = ({ data, action, setSuccess }: Props) => {
           </TooltipContent>
         </Tooltip>
       </PopoverTrigger>
-      <PopoverContent className="w-40 p-1.5 dark:bg-neutral-900 ">
+      <PopoverContent className="w-40 p-1.5 dark:bg-neutral-900 mr-4">
         {action === "trash" ? (
           <div className="space-y-0">
             <Button
-              onClick={() => handleRestore(data?.id)}
+              disabled={loadingRestore}
+              onClick={() => handleRestore(data?.id, data?.type)}
               variant="ghost"
               className="flex w-full  px-2 items-center space-x-2 !justify-start"
             >
               <IconRestore className="w-4 h-4" />
-              <span>Restore</span>
+              {loadingRestore ? (
+                <span className="animate-pulse">Updated...</span>
+              ) : (
+                <span>Restore</span>
+              )}
+            </Button>
+
+            <Button
+              disabled={loadingDelete}
+              onClick={() => handeDelete(data?.id, data?.type)}
+              variant="ghost"
+              className="flex w-full  px-2 items-center space-x-2 !justify-start"
+            >
+              <IconTrashX className="w-4 h-4" />
+              {loadingDelete ? (
+                <span className="animate-pulse">Updated...</span>
+              ) : (
+                <span>Delete</span>
+              )}
             </Button>
           </div>
         ) : (
@@ -308,7 +360,7 @@ const ActionFiles = ({ data, action, setSuccess }: Props) => {
 
             {/* move */}
             {data?.type !== "folders" && (
-              <Dialog>
+              <Dialog open={openMove} onOpenChange={setOpenMove}>
                 <DialogTrigger className="w-full">
                   <Button
                     variant="ghost"
@@ -324,19 +376,23 @@ const ActionFiles = ({ data, action, setSuccess }: Props) => {
                   </DialogHeader>
 
                   <div className="space-y-2">
-                    {fetchFolder?.map((folder: any) => (
-                      <Card
-                        className={`p-2 cursor-pointer dark:hover:bg-neutral-800 duration-300 ${
-                          selectedFolder === folder?.id
-                            ? "dark:border-white"
-                            : ""
-                        }`}
-                        key={folder?.id}
-                        onClick={() => setSelectedFolder(folder?.id)}
-                      >
-                        {folder?.folderName}
-                      </Card>
-                    ))}
+                    {loadingFetchFolder
+                      ? [...Array(5)].map((_, i) => (
+                          <Skeleton key={i} className="h-10 w-full" />
+                        ))
+                      : fetchFolder?.map((folder: any) => (
+                          <Card
+                            className={`p-2 cursor-pointer dark:hover:bg-neutral-800 duration-300 ${
+                              selectedFolder === folder?.id
+                                ? "dark:border-white"
+                                : ""
+                            }`}
+                            key={folder?.id}
+                            onClick={() => setSelectedFolder(folder?.id)}
+                          >
+                            {folder?.name}
+                          </Card>
+                        ))}
                   </div>
 
                   <DialogFooter>

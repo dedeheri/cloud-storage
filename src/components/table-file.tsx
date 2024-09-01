@@ -15,17 +15,7 @@ import {
   IconVideo,
 } from "@tabler/icons-react";
 
-import {
-  Pagination,
-  PaginationContent,
-  PaginationEllipsis,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination";
-
-import ActionFiles from "@/components/files/action-files";
+import ActionFiles from "@/components/action-table-card-file";
 
 import { PhotoProvider, PhotoView } from "react-photo-view";
 import "react-photo-view/dist/react-photo-view.css";
@@ -36,6 +26,7 @@ import Link from "next/link";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 import { ScrollArea, ScrollBar } from "./ui/scroll-area";
 import Mation from "./mation";
+import { useState } from "react";
 
 interface Props {
   data: any;
@@ -46,7 +37,7 @@ interface Props {
 const TableFile = ({ data, action, setSuccess }: Props) => {
   return (
     <Mation>
-      <ScrollArea className="h-[34rem]">
+      <ScrollArea className="min-h-[35rem]">
         <Table className="overflow-x-scroll w-full">
           <TableHeader className=" w-full">
             <TableRow className="whitespace-nowrap">
@@ -58,7 +49,10 @@ const TableFile = ({ data, action, setSuccess }: Props) => {
           </TableHeader>
           <TableBody className="w-full overflow-x-scroll">
             {data?.map((file: any) => (
-              <TableRow key={file.id} className="group whitespace-nowrap p-0">
+              <TableRow
+                key={file.id}
+                className="group whitespace-nowrap p-0 hover:bg-red-50"
+              >
                 <TableCell className="font-medium p-0">
                   <div className="flex justify-between pr-5">
                     <div className="flex items-center space-x-2">
@@ -89,10 +83,7 @@ const TableFile = ({ data, action, setSuccess }: Props) => {
                       ) : (
                         <PhotoProvider>
                           <PhotoView src={file?.url}>
-                            <span className="cursor-pointer">
-                              {" "}
-                              {file?.name}
-                            </span>
+                            <span className="cursor-pointer">{file?.name}</span>
                           </PhotoView>
                         </PhotoProvider>
                       )}
@@ -124,25 +115,9 @@ const TableFile = ({ data, action, setSuccess }: Props) => {
             ))}
           </TableBody>
         </Table>
+
         <ScrollBar orientation="horizontal" />
       </ScrollArea>
-
-      <Pagination className="flex justify-start">
-        <PaginationContent>
-          <PaginationItem>
-            <PaginationPrevious href="#" />
-          </PaginationItem>
-          <PaginationItem>
-            <PaginationLink href="#">1</PaginationLink>
-          </PaginationItem>
-          <PaginationItem>
-            <PaginationEllipsis />
-          </PaginationItem>
-          <PaginationItem>
-            <PaginationNext href="#" />
-          </PaginationItem>
-        </PaginationContent>
-      </Pagination>
     </Mation>
   );
 };

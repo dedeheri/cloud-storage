@@ -39,7 +39,7 @@ export function Container({ children }: Props) {
             sizes
           )}`;
         }}
-        className="h-screen items-stretch overflow-hidden"
+        className="min-h-screen items-stretch fixed  overflow-hidden"
       >
         <ResizablePanel
           defaultSize={defaultLayout[0]}
@@ -70,9 +70,9 @@ export function Container({ children }: Props) {
         <ResizableHandle withHandle />
         <ResizablePanel defaultSize={80}>
           <Navbar />
-          <div className="p-6">
-            <Mation>{children}</Mation>
-          </div>
+          <Mation>
+            <div className="p-6 space-y-8">{children}</div>
+          </Mation>
         </ResizablePanel>
       </ResizablePanelGroup>
     </TooltipProvider>

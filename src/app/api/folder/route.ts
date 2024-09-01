@@ -1,19 +1,37 @@
+import { findManyFolders } from "@/hooks/api/find-folder";
 import { db } from "@/lib/db.prisma";
+import loppingFolder from "@/lib/lopping-folder";
+import pagination from "@/lib/pagination";
 import authOptions from "@/lib/prisma";
+import sortByDate from "@/lib/sort-by-date";
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 
-const responseJson = (message: string, status: number, result?: any) => {
+interface DataProps {
+  id: string;
+  name?: string | null;
+  type: string | null;
+  size: number | null;
+  url: string | null;
+  starred: boolean | false;
+  modified: Date | null;
+}
+
+const response = (
+  message: string,
+  status: number,
+  data?: any,
+  pagination?: any
+) => {
   return NextResponse.json(
     {
       message: message,
-      data: result,
+      pagination,
+      result: data,
     },
     { status: status }
   );
 };
-
-const session = async () => await getServerSession(authOptions);
 
 export const POST = async (req: Request) => {
   try {
@@ -28,7 +46,7 @@ export const POST = async (req: Request) => {
 
     // check file name already exsits
     if (fileNameAlReadyExisist) {
-      return responseJson(`Folder ${folderName} is available`, 409);
+      return response(`Folder ${folderName} is available`, 409);
     }
 
     // create folder
@@ -39,26 +57,33 @@ export const POST = async (req: Request) => {
       },
     });
 
-    return responseJson(`Successfully add Folder ${folderName}`, 200);
+    return response(`Successfully add Folder ${folderName}`, 200);
   } catch (error) {
-    return responseJson("Something went wrong", 500);
+    return response("Something went wrong", 500);
   }
 };
 
-export const GET = async () => {
+export const GET = async (req: Request) => {
   try {
-    const user = await session();
+    // query
+    const { searchParams } = new URL(req.url);
+    const page = searchParams.get("page") as string;
 
-    //   if folder empty
-    const folderByUser = await db.folders.findMany({
-      where: { userId: user?.user?.id, trash: false },
-    });
+    const folder = sortByDate(loppingFolder(await findManyFolders()));
 
-    if (folderByUser.length === 0) return responseJson("Folder is empty", 404);
+    // pagination
+    const startIndex = (parseInt(page) - 1) * 10;
+    const endIndex = parseInt(page) * 10;
+    const paginations = pagination(folder, startIndex, endIndex, page);
+    const slice = folder.slice(startIndex, endIndex);
 
-    return responseJson("Successfully", 200, folderByUser);
+    if (folder?.length === 0) {
+      return response("Folder is empty", 404);
+    } else {
+      return response("Successfully", 200, slice, paginations);
+    }
   } catch (error) {
-    return responseJson("Something went wrong", 500);
+    return response("Something went wrong", 500);
   }
 };
 
@@ -72,7 +97,7 @@ export const PUT = async (req: Request) => {
     });
 
     if (!findFolder) {
-      return responseJson("Folder not found", 404);
+      return response("Folder not found", 404);
     }
 
     const result = await db.folders.update({
@@ -82,7 +107,7 @@ export const PUT = async (req: Request) => {
       },
     });
 
-    return responseJson("Successfully move to Trash", 200);
+    return response("Successfully move to Trash", 200);
   } catch (error) {
     console.log(error);
   }

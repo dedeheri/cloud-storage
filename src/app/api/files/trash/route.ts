@@ -1,4 +1,4 @@
-import { db } from "../../../../lib/db.prisma";
+import { db } from "@/lib/db.prisma";
 
 import { NextResponse } from "next/server";
 
@@ -12,7 +12,6 @@ export const PUT = async (req: Request) => {
     const fileId = searchParams.get("fileId") as string;
     const type = searchParams.get("type") as string;
 
-    // find files
     const findFiles = await db.files.findUnique({
       where: { id: fileId },
     });

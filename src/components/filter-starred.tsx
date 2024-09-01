@@ -2,25 +2,21 @@ import React from "react";
 
 import { IconStar } from "@tabler/icons-react";
 import { Button } from "./ui/button";
-import { useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 const FilterStarred = () => {
   const router = useRouter();
+  const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  const typeQueryStarred = searchParams.get("starred");
-  const [valueFilter, setValueFilter] = React.useState<string>(
-    typeQueryStarred || ""
-  );
+  const starred = searchParams.get("starred");
 
-  let queryParams: any;
+  const [valueFilter, setValueFilter] = React.useState<string>(starred || "");
 
   const handleQuery = () => {
-    // setValueFilter(filterSelected);
-    queryParams = new URLSearchParams(window.location.search);
-    queryParams.set("starred", true);
-    const path = window.location.pathname + "?" + queryParams.toString();
-    router.push(path);
+    const params = new URLSearchParams(searchParams);
+    params.set("starred", starred === "true" ? "false" : "true");
+    router.push(`${pathname}?${params.toString()}`);
   };
 
   React.useEffect(() => {

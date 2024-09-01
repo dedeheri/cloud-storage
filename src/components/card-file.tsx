@@ -1,20 +1,15 @@
 import { Card } from "@/components/ui/card";
-import {
-  IconFileTypeDoc,
-  IconFolder,
-  IconPhoto,
-  IconStar,
-} from "@tabler/icons-react";
+import { IconFolder, IconStar } from "@tabler/icons-react";
 import bytes from "bytes";
 
-import ActionFiles from "./files/action-files";
+import ActionFiles from "./action-table-card-file";
 import Link from "next/link";
 
 import "react-photo-view/dist/react-photo-view.css";
 import { PhotoProvider, PhotoView } from "react-photo-view";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 import { ScrollArea } from "./ui/scroll-area";
-import Image from "next/image";
+
 import Mation from "./mation";
 
 interface Props {
@@ -26,7 +21,7 @@ interface Props {
 const CardFile = ({ data, action, setSuccess }: Props) => {
   return (
     <Mation>
-      <ScrollArea className="h-[39rem]">
+      <ScrollArea className="h-[35rem]">
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6 gap-4 xl:gap-5 ">
           {data?.map((file: any) => (
             <div key={file?.id} className="group duration-300">

@@ -116,35 +116,6 @@ const SidebarLink = ({ isCollapsed }: SidebarLinkProps) => {
                 </TooltipContent>
               </Tooltip>
 
-              {/* starred */}
-              <Tooltip delayDuration={0}>
-                <TooltipTrigger asChild>
-                  <Link
-                    href="/drive/starred"
-                    className={cn(
-                      buttonVariants({
-                        variant:
-                          pathName === "/drive/starred" ? "secondary" : "ghost",
-                        size: "icon",
-                      }),
-                      "h-9 w-9",
-                      pathName === "/drive/starred"
-                        ? "dark:bg-muted dark:text-white dark:hover:bg-muted dark:hover:text-white"
-                        : "text-muted-foreground"
-                    )}
-                  >
-                    <IconStar className="h-6 w-6" />
-                    <span className="sr-only">Starred</span>
-                  </Link>
-                </TooltipTrigger>
-                <TooltipContent
-                  side="right"
-                  className="flex items-center gap-4"
-                >
-                  Starred
-                </TooltipContent>
-              </Tooltip>
-
               {/* trash */}
               <Tooltip delayDuration={0}>
                 <TooltipTrigger asChild>
@@ -250,24 +221,6 @@ const SidebarLink = ({ isCollapsed }: SidebarLinkProps) => {
                 <span className="text-sm">Photo</span>
               </Link>
 
-              {/* starred */}
-              <Link
-                href="/drive/starred"
-                className={cn(
-                  buttonVariants({
-                    variant:
-                      pathName === "/drive/starred" ? "secondary" : "ghost",
-                    size: "sm",
-                  }),
-                  pathName === "/drive/starred"
-                    ? "dark:bg-muted dark:text-white dark:hover:bg-muted dark:hover:text-white justify-start"
-                    : "justify-start text-muted-foreground"
-                )}
-              >
-                <IconStar className="mr-2 h-6 w-6" />
-                <span className="text-sm">Starred</span>
-              </Link>
-
               {/* trash */}
               <Link
                 href="/drive/trash"
@@ -356,9 +309,7 @@ const SidebarLink = ({ isCollapsed }: SidebarLinkProps) => {
                             )}
                           >
                             <IconFolder className="mr-2 h-6 w-6" />
-                            <span className="text-sm">
-                              {folder?.folderName}
-                            </span>
+                            <span className="text-sm">{folder?.name}</span>
                           </Link>
                         ))}
                       </div>

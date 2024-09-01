@@ -1,27 +1,26 @@
+import { findManyFiles } from "@/hooks/api/find-file";
+import { findManyFolders } from "@/hooks/api/find-folder";
+import pagination from "@/lib/pagination";
 import cloudinary from "@/lib/cloudinary";
 import { db } from "@/lib/db.prisma";
+import loppingFile from "@/lib/lopping-file";
+import loppingFolder from "@/lib/lopping-folder";
 import authOptions from "@/lib/prisma";
+import sortByDate from "@/lib/sort-by-date";
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 
-interface DataProps {
-  id: string;
-  name?: string | null;
-  type: string | null;
-  size: number | null;
-  url: string | null;
-  starred: boolean | false;
-  modified: Date | null;
-}
-[];
-
-const session = async () => await getServerSession(authOptions);
-
-const response = (message: string, status: number, data?: any) => {
+const response = (
+  message: string,
+  status: number,
+  data?: any,
+  pagination?: any
+) => {
   return NextResponse.json(
     {
       message: message,
-      data: data,
+      pagination,
+      result: data,
     },
     { status: status }
   );
@@ -32,6 +31,8 @@ export const POST = async (req: NextRequest) => {
     const session = await getServerSession(authOptions);
 
     const formData = await req.formData();
+    const { searchParams } = new URL(req.url);
+    const folderId = searchParams.get("folderId") as string;
     const file = formData.get("file") as File;
 
     const fileBuffer = await file.arrayBuffer();
@@ -56,6 +57,7 @@ export const POST = async (req: NextRequest) => {
         fileSize: uploadFile?.bytes,
         fileUrl: uploadFile?.secure_url,
         fileOwnerId: session?.user?.id,
+        folderId: folderId === "undefined" ? null : folderId,
       },
     });
 
@@ -80,71 +82,29 @@ export const POST = async (req: NextRequest) => {
 
 export const GET = async (req: Request) => {
   try {
-    const user = await session();
-
     const { searchParams } = new URL(req.url);
+    const page = searchParams.get("page") as string;
     const starred = searchParams.get("starred") as string;
 
-    // find files by id
-    const files = await db.files.findMany({
-      skip: 0,
-      take: 20,
-      where: {
-        fileOwnerId: user?.user.id,
-        trash: false,
-      },
-      include: { folder: true },
-    });
+    const file = loppingFile(await findManyFiles());
+    const folder = loppingFolder(await findManyFolders());
 
-    // find folders by id
+    const mergeFileAndFolder = [...file, ...folder];
 
-    const folders = await db.folders.findMany({
-      skip: 0,
-      take: 5,
-      where: { userId: user?.user.id, trash: false },
-    });
+    const sort = sortByDate(mergeFileAndFolder);
 
-    const joinFileAndFolder = () => {
-      const data: DataProps[] = [];
+    // pagination
+    const startIndex = (parseInt(page) - 1) * 12;
+    const endIndex = parseInt(page) * 12;
+    const paginations = pagination(sort, startIndex, endIndex, page);
+    const res = sort.slice(startIndex, endIndex);
 
-      files?.map((file) => {
-        data.push({
-          id: file?.id,
-          name: file?.fileName,
-          type: file?.fileType,
-          size: file?.fileSize,
-          modified: file?.createdAt,
-          url: file?.fileUrl,
-          starred: file?.starred,
-        });
-      });
-
-      folders?.map((folder) => {
-        data.push({
-          id: folder?.id,
-          name: folder?.folderName,
-          type: "folders",
-          size: 0,
-          url: null,
-          starred: folder?.starred,
-          modified: folder?.createdAt,
-        });
-      });
-
-      return data.sort((a: any, b: any) => {
-        return new Date(b.modified).getTime() - new Date(a.modified).getTime();
-      });
-    };
-
-    const result = joinFileAndFolder();
-
-    // check files
-    if (result?.length === 0) {
+    // return json
+    if (mergeFileAndFolder?.length === 0) {
       return response("The file you upload will be available here", 404);
+    } else {
+      return response("Successfully", 200, res, paginations);
     }
-
-    // return all files
-    return response("Successfully", 200, result);
   } catch (error) {
     return response("Something went wrong", 500);
   }
