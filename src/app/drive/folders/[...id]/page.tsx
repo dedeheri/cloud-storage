@@ -48,7 +48,7 @@ const Page = () => {
   return (
     <Container>
       <div className="flex items-center">
-        <UploadFiles success={setFetchAgainAfterAction} />
+        <UploadFiles setSuccess={setFetchAgainAfterAction} />
       </div>
 
       <div className="flex items-center justify-between">
