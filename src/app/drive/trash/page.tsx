@@ -4,9 +4,6 @@ import React, { useEffect, useState } from "react";
 import { Container } from "../../../components/container";
 import axios from "axios";
 
-import TableFile from "../../../components/files/table-file";
-import { Skeleton } from "@/components/ui/skeleton";
-import TableFolder from "@/components/folder/table-folder";
 import { useSearchParams } from "next/navigation";
 import MainContent from "@/components/main-content";
 import ToggleModeDisplay from "@/components/toggle-mode-display";
